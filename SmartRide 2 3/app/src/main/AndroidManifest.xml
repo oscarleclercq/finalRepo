@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="com.microsoft.band.service.access.BIND_BAND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        <receiver
+            android:name=".GeofenceBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" />
+        <!--
+             TODO: Before you run your application, you need a Google Maps API key.
+
+             To get one, follow the directions here:
+
+                https://developers.google.com/maps/documentation/android-sdk/get-api-key
+
+             Once you have your API key (it starts with "AIza"), define a new property in your
+             project's local.properties file (e.g. MAPS_API_KEY=Aiza...), and replace the
+             "YOUR_API_KEY" string in this file with "${MAPS_API_KEY}".
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBiC61FUiDZZeJyInz82uvfTUbruHPKlE0" />
+
+        <activity
+            android:name=".MapsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_maps" />
+        <activity
+            android:name=".MainActivity"
+            android:label="SmartRideTraffic">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!--
+            <receiver
+                android:name=".MyReceiver"
+                android:enabled="true"
+                android:exported="true">
+                <intent-filter>
+                    <action android:name="info.shaunsweeney.smartride" />
+                </intent-filter>
+            </receiver>
+            -->
+        </activity>
+        <activity android:name=".SendCommand" />
+
+        <service
+            android:name=".BluetoothService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".ViewData" />
+
+        <service
+            android:name=".DatabaseService"
+            android:enabled="true"
+            android:exported="true">
+
+            <!--
+            <receiver
+                android:name=".MyReceiver"
+                android:enabled="true"
+                android:exported="true">
+                <intent-filter>
+                    <action android:name="info.shaunsweeney.smartride" />
+                </intent-filter>
+            </receiver>
+            -->
+        </service>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity android:name=".MicrosoftBand" />
+        <activity android:name=".ViewCaloriesControlData" />
+
+        <service
+            android:name=".SumoService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".ProactivePollutionControl" />
+        <activity android:name=".TrafficLightNudgingControl" />
+        <activity android:name=".CooperativeCompetitiveControl" />
+
+        <receiver android:name=".PathsenseGeofenceDemoGeofenceEventReceiver" />
+
+        <meta-data
+            android:name="com.pathsense.android.sdk.CLIENT_ID"
+            android:value="uXsqGyk9vwpUPrSHTqjmshQwVLi8NNcmKah727d1" />
+        <meta-data
+            android:name="com.pathsense.android.sdk.API_KEY"
+            android:value="a3pIJoLl857m4HYCfLXfsaMynUAXKW9C8h5DuNBl" />
+    </application>
+
+</manifest>
