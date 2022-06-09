@@ -1,3 +1,4 @@
+//ssdf
 /*
 * Class Name: MainActivity.java
 * Corresponding layout: activity_main.xml
@@ -10,7 +11,7 @@
 
 
 package ie.ucd.smartride;
-
+/*dfsafdas*/
 import android.app.Activity;
 import android.content.Context;
 import android.content.BroadcastReceiver;
@@ -35,6 +36,7 @@ import android.content.ComponentName;
 import java.util.Arrays;
 import java.util.List;
 
+import ie.ucd.smartride.BluetoothService;
 import ie.ucd.smartride.BluetoothService.BluetoothMyLocalBinder;
 
 import java.util.ArrayList;
