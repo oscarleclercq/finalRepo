@@ -1,8 +1,7 @@
 /*
  * Class Name: BluetoothService.java
  * Corresponding layout: No
- * Author: Shaun Sweeney - shaun.sweeney@ucdconnect.ie // shaunsweeney12@gmail.com
- * Date: March 2017
+ * Author: Shaun Sweeney & Oscar Leclercq
  * Description: BluetoothService connects to the bluetooth device (RN-41 module), and provides methods
  * to listen for incoming data from the bike and to send commands to the bike. It also passes the
  * incoming data from the bike to the Database by means of a Broadcast Receiver. Note - ensure that
@@ -95,25 +94,7 @@ public class BluetoothService extends Service {
         return bluetoothBinder;
     }
 
-    /*public void onNewIntent(Intent i, Context this) {
-        super.onNewIntent(i);
-        if(i.getStringExtra("write").equals("90!")){
-            BluetoothService.write();
-        }
-    }
-
-    public static void write() {
-        // Create temporary object
-        SmartRideConnectedThread r;
-        // Synchronize a copy of the ConnectedThread
-        synchronized (this) {
-            //if (mState != STATE_CONNECTED) return;
-            r = connectedThread;
-        }
-        // Perform the write unsynchronized
-        r.write(out);
-    }*/
-
+    //Start bluetooth by initialising connection to the adapter
     public void bluetoothStart(){
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         pairedDevices = new ArrayList<>();
@@ -196,7 +177,6 @@ public class BluetoothService extends Service {
         connect.start();
     }
 
-    // connectToPairedDevice is used in MainActivity to see if user is paired with device they have selected
 //    public void connectToPairedDevice(String address){
 //        BluetoothDevice selectedDevice = pairedDevices.get(address);
 //

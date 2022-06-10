@@ -1,3 +1,12 @@
+/*
+ * Class Name: GeofenceHelper.java
+ * Corresponding layout: No
+ * Author: Oscar Leclercq
+ * Description: GeofenceHelper handles the backend of setting up geofences (which is called from MapsActivity)
+ * and communicating the triggered geofences to the GeofenceBroadcastReceiver when transitions happen
+ * to enable that activity to trigger the consequences of a geofence transition.
+ * */
+
 package ie.ucd.smartride;
 
 import android.app.PendingIntent;
@@ -13,12 +22,17 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class GeofenceHelper extends ContextWrapper {
 
+    //initialise log tag for debugging
     public static final String TAG = "GeofenceHelper";
+
+    //intents allow this class to communicate with other classes
     PendingIntent pendingIntent;
 
     public GeofenceHelper(Context base) {
         super(base);
     }
+
+    //The following methods are all called from MapsActivity or GeofenceBroadcastReceiver
 
     public GeofencingRequest getGeofencingRequest(Geofence geofence) {
         return new GeofencingRequest.Builder()
@@ -28,8 +42,7 @@ public class GeofenceHelper extends ContextWrapper {
     }
 
     public Geofence getGeofence(String ID, LatLng latLng, float radius, int transitionTypes) {
-
-        // Loitering delay is the time elapsed once you have entered the geofence, before the system considers you to be "dwelling"in the fence.
+        // Loitering delay is the time elapsed once you have entered the geofence, before the system considers you to be "dwelling" in the fence, set here to 5 seconds
         return new Geofence.Builder()
                 .setCircularRegion(latLng.latitude, latLng.longitude, radius)
                 .setRequestId(ID)
@@ -38,6 +51,7 @@ public class GeofenceHelper extends ContextWrapper {
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .build();
     }
+
 
     public PendingIntent getPendingIntent() {
         if (pendingIntent != null) {

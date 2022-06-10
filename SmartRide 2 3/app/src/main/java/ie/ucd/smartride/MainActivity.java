@@ -1,17 +1,16 @@
-//ssdf
 /*
 * Class Name: MainActivity.java
 * Corresponding layout: activity_main.xml
-* Author: Shaun Sweeney - shaun.sweeney@ucdconnect.ie // shaunsweeney12@gmail.com
-* Date: March 2017
+* Author: Oscar Leclercq
 * Description: MainActivity is the launcher activity. It displays a combined list of bluetooth devices
 * that are within range and devices that have already been paired with on the home screen. It also
-* has a number of buttons which are used to launch other activities.
+* has a number of buttons which are used to launch the map activity (and thus the geofencing system),
+* set the motor speed, and play the sound for user testing.
 * */
 
 
 package ie.ucd.smartride;
-/*dfsafdas*/
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.BroadcastReceiver;
@@ -43,20 +42,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity implements OnItemClickListener {
-
+    //initiate log filter for debugging
     public static final String tag = "debugging";
+
+    //initiate the bluetooth service
     BluetoothService bluetoothService;
     boolean bluetoothIsBound=false;
+
+    //initiate lists to display paired devices
     ArrayAdapter<String> activityListAdapter;
     ListView listView;
     IntentFilter filter;
 
+    //initiate handler for timing and repeating motor power values
     Handler handler = new Handler();
 
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        //set layout to that defined by activity_main.xml
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
@@ -67,23 +72,15 @@ public class MainActivity extends Activity implements OnItemClickListener {
 
         //register broadcast receiver to produce list of all available devices for Bluetooth connection
         registerDeviceReceiver();
-
-
     }
 
     //init initialises variables especially the Adapter to store all devices found by Bluetooth
     public void init() {
         listView = (ListView) findViewById(R.id.listView);
+        //onclicklistener triggers connection once the device is clicked
         listView.setOnItemClickListener(this);
         activityListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 0);
         listView.setAdapter(activityListAdapter);
-
-        /*List<String> rampUp = new ArrayList<String>();
-        rampUp.add("90!");
-        rampUp.add("100!");
-        rampUp.add("110!");
-        rampUp.add("120!");
-        rampUp.add("130!");*/
     }
 
     //this method registers the BroadcastReceiver to listen to BluetoothService for the devices
@@ -119,20 +116,13 @@ public class MainActivity extends Activity implements OnItemClickListener {
 
     };
 
-//    @Override
-//    public void onDestroy(){
-//        super.onDestroy();
-//
-//        //bluetoothService.onDestroy();
-//    }
-
-    //method to manage what happens when user clicks one of the devices that have been found by bluetooth
+    //onItemClick manages what happens when user clicks one of the devices that have been found by bluetooth
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
                             long arg3) {
 
+        //check which devices are paired
         if (activityListAdapter.getItem(arg2).contains("Paired")) {
-            //Log.i(tag, "Checking if device " + activityListAdapter.getItem(arg2) + " is paired.");
-            // Take the address out of the string
+            //Take the address out of the string
             String deviceAddress = activityListAdapter.getItem(arg2).split("[\\r\\n]")[1];
             Log.i(tag, "Device address clicked is " + deviceAddress);
 
@@ -143,145 +133,80 @@ public class MainActivity extends Activity implements OnItemClickListener {
         }
     }
 
-    /* The following methods launch different activities depending on the user selection*/
-
-    /*// Method to launch activity to send manual command to bike
-    public void goToSendCommand(View view){
-        Log.i(tag, "About to launch SendCommand");
-        Intent i = new Intent(this, SendCommand.class);
-        startActivity(i);
-    }
-
-    // Method to launch activity to view data saved in database
-    public void goToDb(View view){
-        Log.i(tag, "Launching database activity");
-        Intent j = new Intent(this, ViewData.class);
-        startActivity(j);
-    }
-
-    //method to launch activity to start closed loop feedback control for target calories burned
-    public void startCaloriesActivity(View view){
-        Log.i(tag, "Launching calories activity");
-        Intent k = new Intent(this, MicrosoftBand.class);
-        startActivity(k);
-    }
-
-    //method to launch activity to view data saved in the calories control feedback
-    public void ViewCaloriesControlActivity(View view){
-        Log.i(tag, "Launching view cals control activity");
-        Intent m = new Intent(this, ViewCaloriesControlData.class);
-        startActivity(m);
-    }
-
-    //method to launch activity to minimise cyclist inhalation of pollutants
-    public void StartPollutionControlActivity(View view){
-        Log.i(tag, "Launching proactive pollution control activity");
-        Intent m = new Intent(this, ProactivePollutionControl.class);
-        startActivity(m);
-    }*/
-
-//    public void startTrafficLightNudgingControlActivity(View view){
-//        Log.i(tag, "Launching TrafficLightNudgingControl activity");
-//        Intent n = new Intent(this, TrafficLightNudgingControl.class);
-//        startActivity(n);
-//    }
-
+    //Cooperativecompetitive control is one of the functions used in previous projects, the button launching it has been removed for this project
     public void startCooperativeCompetitiveControlActivity(View view){
         Log.i(tag, "Launching CooperativeCompetitiveControl activity");
         Intent n = new Intent(this, CooperativeCompetitiveControl.class);
         startActivity(n);
     }
 
-    /*List<String> rampUp1 = Arrays.asList("90!", "100!", "110!", "120!", "130!");*/
-
-
-    /*for (int a = 1; a<=all.length ;a++) {
-        handler1.postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                ImageButton btn5 = all[random.nextInt(all.length)];
-                btn5.setBackgroundColor(Color.RED);
-            }
-        }, 1000 * a);
-    }
-}*/
+    //this method runs the motor on fast speed, and sets it up with a handler to be sent every second while running to keep running if brakes are pressed, after they are released
     public Runnable startMotorFast = new Runnable() {
-        /*for (int i = 1; i<=rampUp.size(); i ++){
-
-        }*/
         @Override
         public void run() {
-            // Do something here on the main thread
             Log.i(tag, "Motor On");
+            //Fast motor speed defined here as 150, the ! is used by the arduino to know when the string of digits has ended (hardcoded in the arduino code)
             String message = "150!";
+            //byte converts the message to bytes
             byte[] send = message.getBytes();
+            //the bluetooth service is then called to send the message to the connected device
             bluetoothService.write(send);
             Log.d("Handlers", "Called on main thread");
-            // Repeat this the same runnable code block again another 2 seconds
+            // Repeat this the same runnable code block again every second
             handler.postDelayed(startMotorFast, 1000);
-
         }
     };
 
     public Runnable startMotorSlow = new Runnable() {
-        /*for (int i = 1; i<=rampUp.size(); i ++){
-
-        }*/
+        //same as startMotorFast but with the decided slower speed at 130
         @Override
         public void run() {
-            // Do something here on the main thread
             Log.i(tag, "Motor On");
             String message = "130!";
             byte[] send = message.getBytes();
             bluetoothService.write(send);
             Log.d("Handlers", "Called on main thread");
-            // Repeat this the same runnable code block again another 2 seconds
             handler.postDelayed(startMotorSlow, 1000);
 
         }
     };
 
+    //MotorOn is called when the MotorOn button is pressed, to set the motor speed to fast
     public void MotorOn(View view){
-        /*Log.i(tag, "Motor On");
-        String message = "155!";
-        byte[] send = message.getBytes();
-        bluetoothService.write(send);*/
+        //call startMotorFast handler and stop any other handlers that could interfere (startMotorSlow)
         handler.post(startMotorFast);
         handler.removeCallbacks(startMotorSlow);
     }
 
+    //MotorSlow is the same as MotorOn, but for the slow speed
     public void MotorSlow(View view){
-        /*Log.i(tag, "Motor On");
-        String message = "155!";
-        byte[] send = message.getBytes();
-        bluetoothService.write(send);*/
         handler.post(startMotorSlow);
         handler.removeCallbacks(startMotorFast);
     }
 
+    //MotorOff is called by the MotorOff button, it stops the motor and stops any handlers that would restart it
     public void MotorOff(View view){
         Log.i(tag, "Motor Off");
+        //set new motor speed string to 0
         String message = "0!";
         byte[] send = message.getBytes();
+        //send it to the motor with bluetoothService
         bluetoothService.write(send);
+        //stop any handlers still running
         handler.removeCallbacks(startMotorFast);
         handler.removeCallbacks(startMotorSlow);
     }
 
-    public void MapLaunch(View view){
-        Log.i(tag, "Launching Map activity");
-        Intent n = new Intent(this, MapsActivity.class);
-        startActivity(n);
-    }
-
+    //OnData runs similarly to MotorOn, but this has to be a separate method as it must be static to be called from GeofenceBroadcastReceiver
+    //This method is called when launching the map or exiting a Geofence, with OffData below being called when entering the geofence
     public static void OnData() {
         Log.i(tag, "Sending Data");
-        String message = "90!";
+        String message = "150";
         byte[] send = message.getBytes();
         BluetoothService.write(send);
     }
 
+    //OffData is used when entering the geofence, currently set to stop the motor entirely for demonstration purposes, but could also be set to just a lower speed than OnData
     public static void OffData() {
         Log.i(tag, "Sending Data Off");
         String message = "0!";
@@ -289,16 +214,20 @@ public class MainActivity extends Activity implements OnItemClickListener {
         BluetoothService.write(send);
     }
 
+    //The Noise method is called when pressing the noise button
     public void Noise(View view){
+        //initialise a mediaplayer and connected to the videoplayback file, which is the sound used for warnings
         final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.videoplayback);
+        //start the sound
         mp.start();
     }
 
-    /*@Override
-    protected void onNewIntent(Intent i) {
-        super.onNewIntent(i);
-        if(i.getStringExtra("methodName").equals("myMethod")){
-            MotorOn();
-        }
-    }*/
+    //MapLaunch is triggered when the Map button is pressed on the home page
+    public void MapLaunch(View view){
+        Log.i(tag, "Launching Map activity");
+        //Intents are used when 2 activities will need to continue communicating, which is the case for MapsActivity
+        Intent n = new Intent(this, MapsActivity.class);
+        //Launch the activity
+        startActivity(n);
+    }
 }
